@@ -519,7 +519,7 @@ The Pathway Specification began as an internal backbone of the Insight Quantix T
 
 This specification is released as a draft because the future of TEA/LCA modeling deserves collaboration, critique, and shared standards. Your feedback will directly influence how this specification evolves.
 
-Whether you're a researcher seeking reproducible methods, an engineer building tools, a regulator evaluating pathways, or a company developing clean energy projects—your input is valuable and welcome.
+Whether you're a researcher seeking reproducible methods, an engineer building tools, a regulator evaluating pathways, or a company developing clean energy projects, your input is valuable and welcome.
 
 **Jamie Gomez**
 Founder, Insight Quantix
