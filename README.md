@@ -11,7 +11,7 @@
 
 ## Motivation: Why This Specification Exists
 
-For more than a decade, TEA and LCA modeling has relied on spreadsheets, PDFs, and proprietary tools that make assumptions opaque and studies difficult to reproduce. As models become more complex—hydrogen, SAF, electrofuels, ammonia, CCUS—the limitations of legacy formats prevent automation, collaboration, and transparency.
+For more than a decade, TEA and LCA modeling has relied on spreadsheets, PDFs, and proprietary tools that make assumptions opaque and studies difficult to reproduce. As models become more complex-hydrogen, SAF, electrofuels, ammonia, CCUS-the limitations of legacy formats prevent automation, collaboration, and transparency.
 
 **The Insight Quantix Pathway Specification proposes a modern alternative**: a human-readable, version-controlled, machine-parseable configuration format for TEA/LCA pathways. The goal is not to replace existing tools, but to give the field a shared language for defining pathways—one that is transparent, auditable, extensible, and compatible with automation workflows and modern software ecosystems.
 
