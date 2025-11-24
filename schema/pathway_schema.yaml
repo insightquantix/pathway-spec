@@ -1,0 +1,598 @@
+# Insight Quantix Pathway Specification Schema
+# Version: 0.1-draft
+# Format: YAML with inline documentation
+#
+# This file documents the structure and fields for pathway definitions.
+# It serves as both documentation and reference for validation tools.
+#
+# Note: This is NOT a JSON Schema or formal schema language.
+# Formal schema validation to be added in v0.2+
+
+# ==============================================================================
+# TOP-LEVEL STRUCTURE
+# ==============================================================================
+
+meta:
+  # Pathway metadata and scope definition
+  # REQUIRED section
+
+  name: string
+    # Human-readable pathway name
+    # Example: "HEFA-based Sustainable Aviation Fuel"
+
+  version: string
+    # Pathway version following semantic versioning (MAJOR.MINOR.PATCH)
+    # Example: "1.0.0"
+
+  date: string
+    # ISO 8601 date of last modification
+    # Example: "2025-01-23"
+
+  author: string
+    # Primary author or organization
+    # Example: "Insight Quantix"
+
+  description: string
+    # Brief pathway description (1-3 sentences)
+
+  functional_unit: string
+    # LCA functional unit for the study
+    # Example: "MJ jet fuel (LHV)" or "kg H2 delivered"
+
+  boundary: string
+    # System boundary description
+    # Options: "cradle-to-gate", "cradle-to-grave", "gate-to-gate", "well-to-wake", custom
+    # Example: "cradle-to-gate (feedstock production through fuel production)"
+
+  reference_year: integer
+    # Base year for economic data (CAPEX, OPEX)
+    # Example: 2024
+
+  currency: string
+    # Currency for all economic values
+    # Example: "USD"
+
+  tags: [string]
+    # Keywords for categorization
+    # Example: ["SAF", "HEFA", "biofuels"]
+
+  data_quality: string
+    # Overall data quality assessment
+    # Options: "validated", "engineering_estimate", "literature", "preliminary"
+    # OPTIONAL
+
+  notes: string
+    # Additional context or caveats
+    # OPTIONAL
+
+
+# ==============================================================================
+# FEEDSTOCKS
+# ==============================================================================
+
+feedstocks:
+  # Definition of input materials to the pathway
+  # REQUIRED section (even if empty for some pathways)
+  # Structure: {feedstock_id: {properties}}
+
+  <feedstock_id>:
+    # Unique identifier for this feedstock (snake_case recommended)
+    # Example: "soybean_oil", "renewable_electricity", "waste_cooking_oil"
+
+    name: string
+      # Human-readable name
+
+    type: string
+      # Feedstock category
+      # Examples: "vegetable_oil", "electricity", "natural_gas", "biomass", "water"
+
+    phase: string
+      # Physical state
+      # Options: "solid", "liquid", "gas", "electricity"
+
+    composition: {string: float}
+      # Mass or mole fractions of constituents
+      # Sum should equal 1.0
+      # Example: {TAG: 0.95, FFA: 0.05, water: 0.01}
+      # OPTIONAL - depends on pathway complexity
+
+    lhv:
+      value: float
+      unit: string
+      # Lower heating value (energy content)
+      # Example: {value: 37.5, unit: "MJ/kg"}
+      # OPTIONAL
+
+    hhv:
+      value: float
+      unit: string
+      # Higher heating value
+      # OPTIONAL
+
+    cost:
+      value: float
+      unit: string
+      # Feedstock purchase cost
+      # Example: {value: 800, unit: "USD/tonne"}
+      # OPTIONAL
+
+    ci_production:
+      value: float
+      unit: string
+      source: string
+      # Carbon intensity of feedstock production
+      # Example: {value: 25.6, unit: "gCO2e/MJ", source: "GREET 2023"}
+      # OPTIONAL
+
+    properties: {string: any}
+      # Additional feedstock-specific properties
+      # Example: {density: {value: 920, unit: "kg/m3"}, viscosity: {...}}
+      # OPTIONAL
+
+
+# ==============================================================================
+# PRODUCTS
+# ==============================================================================
+
+products:
+  # Definition of output products from the pathway
+  # REQUIRED section
+  # Structure: {product_id: {properties}}
+
+  <product_id>:
+    # Unique identifier for this product (snake_case)
+    # Example: "saf_jet_fuel", "green_hydrogen", "green_diesel"
+
+    name: string
+      # Human-readable name
+
+    type: string
+      # Product category
+      # Examples: "jet_fuel", "diesel", "hydrogen", "ammonia", "electricity"
+
+    specification: string
+      # Industry specification met
+      # Examples: "ASTM D7566 (SAF)", "SAE AIR6241", "Jet A-1"
+      # OPTIONAL
+
+    phase: string
+      # Physical state
+
+    lhv:
+      value: float
+      unit: string
+      # Lower heating value
+
+    hhv:
+      value: float
+      unit: string
+      # OPTIONAL
+
+    properties: {string: any}
+      # Product-specific properties
+      # Example: {freeze_point: {value: -47, unit: "C"}, density: {...}}
+      # OPTIONAL
+
+
+# ==============================================================================
+# STREAMS
+# ==============================================================================
+
+streams:
+  # Material and energy flows between units
+  # REQUIRED section for pathways with unit operations
+  # Structure: {stream_id: {properties}}
+
+  <stream_id>:
+    # Unique identifier (snake_case)
+    # Example: "S001_feed_oil", "S002_hydrogen", "S010_jet_product"
+
+    name: string
+      # Human-readable name
+
+    from_unit: string
+      # Source unit operation ID (null if feedstock entry)
+      # Example: "hydrotreater" or null
+
+    to_unit: string
+      # Destination unit operation ID (null if final product)
+      # Example: "fractionator" or null
+
+    phase: string
+      # Physical state
+
+    temperature:
+      value: float
+      unit: string
+      # Stream temperature
+      # Example: {value: 350, unit: "C"}
+      # OPTIONAL
+
+    pressure:
+      value: float
+      unit: string
+      # Stream pressure
+      # Example: {value: 80, unit: "bar"}
+      # OPTIONAL
+
+    mass_flow:
+      value: float
+      unit: string
+      basis: string
+      # Mass flow rate
+      # Example: {value: 1000, unit: "kg/h", basis: "per tonne feedstock"}
+      # OPTIONAL - either mass_flow or mole_flow should be provided
+
+    mole_flow:
+      value: float
+      unit: string
+      # Mole flow rate
+      # OPTIONAL
+
+    composition: {string: float}
+      # Component mass or mole fractions
+      # OPTIONAL - useful for detailed modeling
+
+    energy_flow:
+      value: float
+      unit: string
+      # Energy content of stream (for heat/electricity streams)
+      # Example: {value: 500, unit: "kW"}
+      # OPTIONAL
+
+
+# ==============================================================================
+# UNIT OPERATIONS
+# ==============================================================================
+
+units:
+  # Process unit operations that transform streams
+  # REQUIRED section
+  # Structure: {unit_id: {properties}}
+
+  <unit_id>:
+    # Unique identifier (snake_case)
+    # Example: "hydrotreater", "electrolyzer_pem", "distillation_column"
+
+    name: string
+      # Human-readable name
+
+    type: string
+      # Unit operation type
+      # Examples: "reactor", "heat_exchanger", "separator", "compressor", "pump", "electrolyzer"
+
+    description: string
+      # Brief description of unit function
+      # OPTIONAL
+
+    inputs: [string]
+      # List of input stream IDs
+      # Example: ["S001_feed_oil", "S002_hydrogen"]
+
+    outputs: [string]
+      # List of output stream IDs
+      # Example: ["S010_jet_product", "S011_diesel", "S012_off_gas"]
+
+    capacity:
+      value: float
+      unit: string
+      # Design capacity
+      # Example: {value: 100000, unit: "tonnes/year"}
+      # OPTIONAL
+
+    operating_conditions:
+      # Key process parameters
+      # OPTIONAL - structure depends on unit type
+      temperature: {value: float, unit: string}
+      pressure: {value: float, unit: string}
+      residence_time: {value: float, unit: string}
+      # ... additional parameters as needed
+
+    conversion: {string: float}
+      # Reactant conversion or yield
+      # Example: {triglycerides: 0.98}
+      # OPTIONAL
+
+    selectivity: {string: float}
+      # Product selectivity
+      # Example: {jet_fraction: 0.45, diesel_fraction: 0.50, gas_fraction: 0.05}
+      # OPTIONAL
+
+    energy_consumption:
+      electricity: {value: float, unit: string}
+      heat: {value: float, unit: string}
+      cooling: {value: float, unit: string}
+      # Energy inputs to unit
+      # OPTIONAL
+
+    catalyst:
+      type: string
+      loading: {value: float, unit: string}
+      lifetime: {value: float, unit: string}
+      cost: {value: float, unit: string}
+      # Catalyst information
+      # OPTIONAL
+
+
+# ==============================================================================
+# MASS/ENERGY BALANCES
+# ==============================================================================
+
+balances:
+  # Overall pathway mass and energy balances
+  # OPTIONAL section (recommended for validation)
+
+  mass_balance:
+    inputs:
+      {feedstock_id: {value: float, unit: string}}
+      # Total mass inputs
+      # Example: {soybean_oil: {value: 1000, unit: "kg/h"}}
+
+    outputs:
+      {product_id: {value: float, unit: string}}
+      # Total mass outputs
+
+    closure:
+      value: float
+      unit: string
+      # Mass balance closure (should be ~100%)
+      # Example: {value: 99.8, unit: "%"}
+
+  energy_balance:
+    # Similar structure for energy
+    # OPTIONAL
+    inputs: {string: {value: float, unit: string}}
+    outputs: {string: {value: float, unit: string}}
+    closure: {value: float, unit: string}
+
+
+# ==============================================================================
+# TECHNO-ECONOMIC ANALYSIS (TEA)
+# ==============================================================================
+
+tea:
+  # Economic analysis parameters
+  # OPTIONAL section
+
+  capex:
+    # Capital expenditures
+    # Structure: {category: {value: float, unit: string}}
+
+    direct_costs:
+      {unit_id: {value: float, unit: string, source: string}}
+      # Direct equipment costs
+      # Example: {hydrotreater: {value: 50.0, unit: "MM USD", source: "vendor quote"}}
+
+    indirect_costs:
+      installation: {value: float, unit: string}
+      engineering: {value: float, unit: string}
+      contingency: {value: float, unit: string}
+      # Indirect costs as percentages or absolute values
+      # OPTIONAL
+
+    total:
+      value: float
+      unit: string
+      # Total CAPEX
+      # Example: {value: 250.0, unit: "MM USD"}
+
+  opex:
+    # Operating expenditures (annual basis)
+    # Structure: {category: {value: float, unit: string}}
+
+    variable_costs:
+      feedstock: {string: {value: float, unit: string}}
+      utilities: {string: {value: float, unit: string}}
+      catalysts: {string: {value: float, unit: string}}
+      # Per-unit production costs
+
+    fixed_costs:
+      labor: {value: float, unit: string}
+      maintenance: {value: float, unit: string}
+      overhead: {value: float, unit: string}
+      # Annual fixed costs
+
+    total_annual:
+      value: float
+      unit: string
+      # Total annual OPEX
+
+  financial_assumptions:
+    plant_lifetime: {value: integer, unit: "years"}
+    discount_rate: {value: float, unit: "%"}
+    capacity_factor: {value: float, unit: "%"}
+    # Financial parameters for NPV, IRR calculations
+    # OPTIONAL
+
+
+# ==============================================================================
+# LIFE-CYCLE ASSESSMENT (LCA)
+# ==============================================================================
+
+lca:
+  # Life-cycle assessment parameters
+  # OPTIONAL section
+
+  functional_unit: string
+    # Restate functional unit for clarity
+    # Should match meta.functional_unit
+
+  allocation_method: string
+    # How to allocate impacts among co-products
+    # Options: "energy", "mass", "economic", "system_expansion"
+    # Example: "energy"
+
+  emission_factors:
+    # Emission factors for inputs/processes
+    # Structure: {category: {item: {value, unit, source}}}
+
+    feedstocks:
+      {feedstock_id:
+        {value: float, unit: string, source: string, scope: string}}
+      # Example: {soybean_oil: {value: 25.6, unit: "gCO2e/MJ", source: "GREET 2023", scope: "cradle-to-gate"}}
+
+    utilities:
+      electricity: {value: float, unit: string, source: string, mix: string}
+      natural_gas: {value: float, unit: string, source: string}
+      steam: {value: float, unit: string, source: string}
+      # Emission factors for energy inputs
+
+    process_emissions:
+      {unit_id: {value: float, unit: string, type: string}}
+      # Direct emissions from process units
+      # Example: {combustor: {value: 50, unit: "kgCO2/h", type: "combustion"}}
+
+  impact_results:
+    # Calculated impact assessment results
+    # OPTIONAL - typically calculated by external tools
+
+    climate_change:
+      value: float
+      unit: string
+      method: string
+      # Example: {value: 45.2, unit: "gCO2e/MJ fuel", method: "IPCC AR6 GWP100"}
+
+    # Additional impact categories as needed
+    # Examples: acidification, eutrophication, water_use, etc.
+
+  uncertainty:
+    # Uncertainty characterization
+    # OPTIONAL
+    {parameter: {distribution: string, parameters: {string: float}}}
+    # Example: {soy_ci: {distribution: "normal", parameters: {mean: 25.6, std: 3.2}}}
+
+
+# ==============================================================================
+# SENSITIVITY ANALYSIS
+# ==============================================================================
+
+sensitivity:
+  # Parameters for sensitivity/scenario analysis
+  # OPTIONAL section
+
+  parameters:
+    {parameter_path:
+      {baseline: float, range: {min: float, max: float}, unit: string}}
+    # Example:
+    # feedstocks.soybean_oil.cost:
+    #   baseline: 800
+    #   range: {min: 600, max: 1000}
+    #   unit: "USD/tonne"
+
+  scenarios:
+    {scenario_name: {description: string, changes: {parameter_path: float}}}
+    # Example:
+    # high_feedstock:
+    #   description: "High feedstock cost scenario"
+    #   changes:
+    #     feedstocks.soybean_oil.cost: 1000
+
+
+# ==============================================================================
+# DATA PROVENANCE
+# ==============================================================================
+
+provenance:
+  # Data sources and quality metadata
+  # OPTIONAL section (recommended for transparency)
+
+  sources:
+    {source_id:
+      {citation: string, url: string, date_accessed: string, reliability: string}}
+    # Example:
+    # greet2023:
+    #   citation: "GREET Model 2023, Argonne National Laboratory"
+    #   url: "https://greet.es.anl.gov/"
+    #   date_accessed: "2025-01-15"
+    #   reliability: "high"
+
+  assumptions:
+    {assumption_id: {description: string, justification: string, impact: string}}
+    # Document key assumptions
+    # Example:
+    # hydrogen_source:
+    #   description: "Hydrogen sourced from natural gas SMR"
+    #   justification: "Most common current industrial source"
+    #   impact: "High CI compared to renewable H2"
+
+
+# ==============================================================================
+# VALIDATION AND QUALITY
+# ==============================================================================
+
+validation:
+  # Validation checks and results
+  # OPTIONAL - typically added by validation tools
+
+  mass_balance_check:
+    status: string  # "pass", "fail", "warning"
+    message: string
+    tolerance: float
+
+  energy_balance_check:
+    status: string
+    message: string
+    tolerance: float
+
+  schema_validation:
+    status: string
+    validator_version: string
+    timestamp: string
+
+  warnings: [string]
+    # List of validation warnings
+
+
+# ==============================================================================
+# EXTENSIONS
+# ==============================================================================
+
+extensions:
+  # Namespace for domain-specific or proprietary extensions
+  # OPTIONAL
+  # Allows custom fields without conflicting with core spec
+
+  {extension_name: {arbitrary structure}}
+  # Example:
+  # insight_quantix:
+  #   optimization_hints: {...}
+  #   proprietary_parameters: {...}
+
+
+# ==============================================================================
+# NOTES ON USAGE
+# ==============================================================================
+
+# 1. REQUIRED vs OPTIONAL:
+#    - meta, feedstocks, products, units are REQUIRED
+#    - All other top-level sections are OPTIONAL but recommended
+#    - Within sections, specific fields marked REQUIRED or OPTIONAL
+#
+# 2. UNITS:
+#    - Always specify units explicitly in {value, unit} format
+#    - Use SI units where possible (kg, m, J, Pa, K)
+#    - Common exceptions: USD, MJ, bar, °C (for practicality)
+#
+# 3. IDENTIFIERS:
+#    - Use snake_case for all IDs (feedstock_id, stream_id, etc.)
+#    - IDs must be unique within their category
+#    - Can reference IDs across sections (e.g., stream.from_unit = unit_id)
+#
+# 4. EXTENSIBILITY:
+#    - Add custom fields under "extensions" namespace
+#    - Avoid modifying core schema structure
+#    - Propose new core fields via GitHub Issues
+#
+# 5. VALIDATION:
+#    - Use validation tools to check structure
+#    - Mass/energy balance closure recommended
+#    - Document assumptions in "provenance" section
+#
+# 6. VERSIONING:
+#    - Pathway version in meta.version
+#    - Spec version in this file header
+#    - Breaking changes increment major version
+
+# ==============================================================================
+# END OF SCHEMA
+# ==============================================================================

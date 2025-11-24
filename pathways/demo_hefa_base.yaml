@@ -1,0 +1,833 @@
+# =============================================================================
+# DEMO HEFA-BASED SUSTAINABLE AVIATION FUEL PATHWAY
+# =============================================================================
+#
+# IMPORTANT DISCLAIMER:
+# This is a SIMPLIFIED DEMONSTRATION pathway for illustrating the spec format.
+# Values are order-of-magnitude estimates from public literature.
+# DO NOT USE for actual project design, investment decisions, or regulatory
+# submissions without proper validation and site-specific engineering.
+#
+# Purpose: Show structure and syntax of Pathway Specification v0.5
+# Validation: Level 1 (compared against NREL TP-5100-58677, see docs/VALIDATION.md)
+# Status: Unvalidated demonstration example
+# Based on: Generic HEFA (Hydroprocessed Esters and Fatty Acids) process
+#
+# =============================================================================
+
+meta:
+  name: "HEFA-based Sustainable Aviation Fuel (Demo)"
+  version: "0.1.0"
+  date: "2025-01-23"
+  author: "Insight Quantix"
+  description: >
+    Simplified hydroprocessing pathway converting vegetable oil to renewable
+    jet and diesel fuels. Demonstrates Pathway Specification structure with
+    representative (but unvalidated) parameters.
+
+  functional_unit: "MJ jet fuel (LHV)"
+  boundary: "cradle-to-gate (feedstock production through fuel production)"
+  reference_year: 2024
+  currency: "USD"
+
+  tags:
+    - SAF
+    - HEFA
+    - biofuels
+    - renewable_diesel
+    - hydroprocessing
+
+  data_quality: "preliminary"
+
+  notes: >
+    This pathway omits many real-world complexities including:
+    - Detailed utility integration
+    - Hydrogen production pathway
+    - Wastewater treatment
+    - Tank farm and logistics
+    - Site-specific factors
+    Values are based on literature averages and should not be considered
+    validated for any specific project.
+
+# =============================================================================
+# FEEDSTOCKS
+# =============================================================================
+
+feedstocks:
+  soybean_oil:
+    name: "Soybean Oil"
+    type: "vegetable_oil"
+    phase: "liquid"
+
+    composition:
+      triglycerides: 0.95
+      free_fatty_acids: 0.03
+      water: 0.01
+      other: 0.01
+
+    lhv:
+      value: 37.5
+      unit: "MJ/kg"
+
+    cost:
+      value: 800
+      unit: "USD/tonne"
+
+    ci_production:
+      value: 25.6
+      unit: "gCO2e/MJ"
+      source: "GREET 2023 (soybean farming and oil extraction)"
+
+    properties:
+      density:
+        value: 920
+        unit: "kg/m3"
+      iodine_value:
+        value: 130
+        unit: "g I2/100g"
+
+  hydrogen:
+    name: "Hydrogen"
+    type: "industrial_gas"
+    phase: "gas"
+
+    lhv:
+      value: 120
+      unit: "MJ/kg"
+
+    cost:
+      value: 2.50
+      unit: "USD/kg"
+
+    ci_production:
+      value: 94.5
+      unit: "gCO2e/MJ H2"
+      source: "GREET 2023 (natural gas SMR, U.S. average)"
+
+    notes: "Assumed sourced from natural gas steam methane reforming (SMR)"
+
+  electricity:
+    name: "Grid Electricity"
+    type: "electricity"
+    phase: "electricity"
+
+    cost:
+      value: 0.08
+      unit: "USD/kWh"
+
+    ci_production:
+      value: 468
+      unit: "gCO2e/kWh"
+      source: "GREET 2023 (U.S. average grid mix)"
+
+  natural_gas:
+    name: "Natural Gas"
+    type: "fossil_fuel"
+    phase: "gas"
+
+    lhv:
+      value: 48.6
+      unit: "MJ/kg"
+
+    cost:
+      value: 5.00
+      unit: "USD/MMBtu"
+
+    ci_production:
+      value: 59.1
+      unit: "gCO2e/MJ"
+      source: "GREET 2023"
+
+# =============================================================================
+# PRODUCTS
+# =============================================================================
+
+products:
+  saf_jet:
+    name: "Sustainable Aviation Fuel (SAF)"
+    type: "jet_fuel"
+    specification: "ASTM D7566 Annex A2 (HEFA-SPK)"
+    phase: "liquid"
+
+    lhv:
+      value: 43.2
+      unit: "MJ/kg"
+
+    properties:
+      density:
+        value: 765
+        unit: "kg/m3"
+      freeze_point:
+        value: -47
+        unit: "C"
+      aromatics:
+        value: 0.5
+        unit: "vol%"
+        notes: "Requires blending with conventional jet for aromatics content"
+
+  renewable_diesel:
+    name: "Renewable Diesel"
+    type: "diesel_fuel"
+    specification: "ASTM D975 (meets diesel specs)"
+    phase: "liquid"
+
+    lhv:
+      value: 44.0
+      unit: "MJ/kg"
+
+    properties:
+      cetane_number:
+        value: 75
+        unit: "dimensionless"
+
+  lpg_byproduct:
+    name: "Propane/LPG"
+    type: "fuel_gas"
+    phase: "liquid"
+
+    lhv:
+      value: 46.3
+      unit: "MJ/kg"
+
+# =============================================================================
+# STREAMS
+# =============================================================================
+
+streams:
+  S001_feed_oil:
+    name: "Feed Oil to Pretreatment"
+    from_unit: null  # External feedstock
+    to_unit: "pretreatment"
+    phase: "liquid"
+    temperature:
+      value: 25
+      unit: "C"
+    pressure:
+      value: 1
+      unit: "bar"
+    mass_flow:
+      value: 1000
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+  S002_pretreated_oil:
+    name: "Pretreated Oil to Hydrotreater"
+    from_unit: "pretreatment"
+    to_unit: "hydrotreater"
+    phase: "liquid"
+    temperature:
+      value: 80
+      unit: "C"
+    mass_flow:
+      value: 995
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+  S003_hydrogen:
+    name: "Hydrogen to Hydrotreater"
+    from_unit: null
+    to_unit: "hydrotreater"
+    phase: "gas"
+    temperature:
+      value: 300
+      unit: "C"
+    pressure:
+      value: 80
+      unit: "bar"
+    mass_flow:
+      value: 35
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+    notes: "Includes makeup + recycle"
+
+  S004_reactor_effluent:
+    name: "Hydrotreater Effluent"
+    from_unit: "hydrotreater"
+    to_unit: "separator"
+    phase: "mixed"
+    temperature:
+      value: 350
+      unit: "C"
+    pressure:
+      value: 75
+      unit: "bar"
+    mass_flow:
+      value: 1030
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+  S005_gas_products:
+    name: "Light Gases (C1-C4)"
+    from_unit: "separator"
+    to_unit: null
+    phase: "gas"
+    mass_flow:
+      value: 80
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+    notes: "Sent to fuel gas system"
+
+  S006_liquid_products:
+    name: "Hydrocarbon Liquid Products"
+    from_unit: "separator"
+    to_unit: "fractionator"
+    phase: "liquid"
+    temperature:
+      value: 60
+      unit: "C"
+    mass_flow:
+      value: 950
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+  S007_naphtha:
+    name: "Naphtha Fraction"
+    from_unit: "fractionator"
+    to_unit: null
+    phase: "liquid"
+    mass_flow:
+      value: 50
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+  S008_jet_fraction:
+    name: "Jet Fuel Fraction (SAF)"
+    from_unit: "fractionator"
+    to_unit: null
+    phase: "liquid"
+    mass_flow:
+      value: 450
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+    composition:
+      C9_C16_paraffins: 0.95
+      C9_C16_isoparaffins: 0.05
+
+  S009_diesel_fraction:
+    name: "Diesel Fraction"
+    from_unit: "fractionator"
+    to_unit: null
+    phase: "liquid"
+    mass_flow:
+      value: 400
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+  S010_heavy_fraction:
+    name: "Heavy Wax"
+    from_unit: "fractionator"
+    to_unit: null
+    phase: "liquid"
+    mass_flow:
+      value: 50
+      unit: "kg/h"
+      basis: "per 1000 kg/h oil feed"
+
+# =============================================================================
+# UNIT OPERATIONS
+# =============================================================================
+
+units:
+  pretreatment:
+    name: "Oil Pretreatment"
+    type: "filtration_and_heating"
+    description: "Remove impurities and heat oil to processing temperature"
+
+    inputs: ["S001_feed_oil"]
+    outputs: ["S002_pretreated_oil"]
+
+    capacity:
+      value: 100000
+      unit: "tonnes oil/year"
+
+    energy_consumption:
+      electricity:
+        value: 10
+        unit: "kWh/tonne oil"
+      heat:
+        value: 0.2
+        unit: "GJ/tonne oil"
+
+  hydrotreater:
+    name: "Hydrotreating Reactor"
+    type: "fixed_bed_reactor"
+    description: "Catalytic hydrogenation removes oxygen, saturates double bonds"
+
+    inputs: ["S002_pretreated_oil", "S003_hydrogen"]
+    outputs: ["S004_reactor_effluent"]
+
+    capacity:
+      value: 100000
+      unit: "tonnes oil/year"
+
+    operating_conditions:
+      temperature:
+        value: 350
+        unit: "C"
+      pressure:
+        value: 80
+        unit: "bar"
+      lhsv:
+        value: 1.2
+        unit: "h-1"
+        notes: "Liquid hourly space velocity"
+      h2_partial_pressure:
+        value: 70
+        unit: "bar"
+
+    conversion:
+      triglycerides: 0.999
+      free_fatty_acids: 1.0
+
+    selectivity:
+      liquid_hydrocarbons: 0.92
+      light_gases: 0.08
+
+    catalyst:
+      type: "NiMo/Al2O3"
+      loading:
+        value: 50
+        unit: "kg catalyst/m3 reactor"
+      lifetime:
+        value: 3
+        unit: "years"
+      cost:
+        value: 25
+        unit: "USD/kg"
+
+    energy_consumption:
+      electricity:
+        value: 15
+        unit: "kWh/tonne feed"
+        notes: "Pumps, compressors"
+
+  separator:
+    name: "Gas-Liquid Separator"
+    type: "separator"
+    description: "Separate gas products from liquid hydrocarbons"
+
+    inputs: ["S004_reactor_effluent"]
+    outputs: ["S005_gas_products", "S006_liquid_products"]
+
+    operating_conditions:
+      temperature:
+        value: 40
+        unit: "C"
+      pressure:
+        value: 30
+        unit: "bar"
+
+  fractionator:
+    name: "Fractionation Column"
+    type: "distillation_column"
+    description: "Separate products by boiling point into fuel cuts"
+
+    inputs: ["S006_liquid_products"]
+    outputs: ["S007_naphtha", "S008_jet_fraction", "S009_diesel_fraction", "S010_heavy_fraction"]
+
+    operating_conditions:
+      top_temperature:
+        value: 170
+        unit: "C"
+      bottom_temperature:
+        value: 350
+        unit: "C"
+      pressure:
+        value: 1.5
+        unit: "bar"
+      reflux_ratio:
+        value: 3.0
+        unit: "dimensionless"
+
+    energy_consumption:
+      heat:
+        value: 0.3
+        unit: "GJ/tonne feed"
+        notes: "Reboiler duty"
+      cooling:
+        value: 0.25
+        unit: "GJ/tonne feed"
+        notes: "Condenser duty"
+      electricity:
+        value: 5
+        unit: "kWh/tonne feed"
+        notes: "Pumps"
+
+# =============================================================================
+# MASS/ENERGY BALANCES
+# =============================================================================
+
+balances:
+  mass_balance:
+    inputs:
+      soybean_oil:
+        value: 1000
+        unit: "kg/h"
+      hydrogen:
+        value: 35
+        unit: "kg/h"
+
+    outputs:
+      saf_jet:
+        value: 450
+        unit: "kg/h"
+      renewable_diesel:
+        value: 400
+        unit: "kg/h"
+      naphtha:
+        value: 50
+        unit: "kg/h"
+      heavy_wax:
+        value: 50
+        unit: "kg/h"
+      light_gases:
+        value: 80
+        unit: "kg/h"
+      water:
+        value: 5
+        unit: "kg/h"
+
+    closure:
+      value: 100.0
+      unit: "%"
+      notes: "Balanced for demonstration; real plants have losses"
+
+  energy_balance:
+    inputs:
+      feed_oil_energy:
+        value: 37.5
+        unit: "GJ/tonne oil"
+      hydrogen_energy:
+        value: 4.2
+        unit: "GJ/tonne oil"
+        notes: "35 kg H2 × 120 MJ/kg"
+      process_heat:
+        value: 0.5
+        unit: "GJ/tonne oil"
+      electricity:
+        value: 0.11
+        unit: "GJ/tonne oil"
+        notes: "~30 kWh/tonne"
+
+    outputs:
+      jet_fuel_energy:
+        value: 19.4
+        unit: "GJ/tonne oil"
+        notes: "450 kg × 43.2 MJ/kg"
+      diesel_energy:
+        value: 17.6
+        unit: "GJ/tonne oil"
+        notes: "400 kg × 44.0 MJ/kg"
+      other_products_energy:
+        value: 4.8
+        unit: "GJ/tonne oil"
+      heat_losses:
+        value: 0.5
+        unit: "GJ/tonne oil"
+
+    closure:
+      value: 99.5
+      unit: "%"
+
+# =============================================================================
+# TECHNO-ECONOMIC ANALYSIS (TEA)
+# =============================================================================
+
+tea:
+  capex:
+    direct_costs:
+      pretreatment:
+        value: 5.0
+        unit: "MM USD"
+        source: "engineering estimate"
+
+      hydrotreater:
+        value: 80.0
+        unit: "MM USD"
+        source: "literature (scaled from NREL reports)"
+
+      separator:
+        value: 8.0
+        unit: "MM USD"
+        source: "engineering estimate"
+
+      fractionator:
+        value: 15.0
+        unit: "MM USD"
+        source: "engineering estimate"
+
+      utilities:
+        value: 25.0
+        unit: "MM USD"
+        source: "percentage of ISBL"
+        notes: "Boilers, cooling towers, air compressors"
+
+      storage:
+        value: 12.0
+        unit: "MM USD"
+        source: "engineering estimate"
+
+    indirect_costs:
+      engineering:
+        value: 20.0
+        unit: "MM USD"
+        notes: "~14% of direct costs"
+
+      construction:
+        value: 15.0
+        unit: "MM USD"
+
+      contingency:
+        value: 30.0
+        unit: "MM USD"
+        notes: "~15% for demonstration"
+
+    total:
+      value: 210.0
+      unit: "MM USD"
+      notes: "Order of magnitude estimate; site-specific factors can vary ±40%"
+
+  opex:
+    variable_costs:
+      feedstock:
+        soybean_oil:
+          value: 80.0
+          unit: "MM USD/year"
+          basis: "100,000 tonnes/yr × $800/tonne"
+
+        hydrogen:
+          value: 8.75
+          unit: "MM USD/year"
+          basis: "3,500 tonnes/yr × $2,500/tonne"
+
+        electricity:
+          value: 0.24
+          unit: "MM USD/year"
+          basis: "~3 GWh/yr × $80/MWh"
+
+        natural_gas:
+          value: 2.0
+          unit: "MM USD/year"
+          basis: "Process heat"
+
+      catalysts:
+        hydrotreating_catalyst:
+          value: 0.8
+          unit: "MM USD/year"
+          basis: "Replacement every 3 years"
+
+    fixed_costs:
+      labor:
+        value: 3.0
+        unit: "MM USD/year"
+        notes: "~20 FTE operations + maintenance"
+
+      maintenance:
+        value: 6.3
+        unit: "MM USD/year"
+        notes: "~3% of CAPEX annually"
+
+      overhead:
+        value: 2.5
+        unit: "MM USD/year"
+        notes: "Admin, insurance, property tax"
+
+    total_annual:
+      value: 103.6
+      unit: "MM USD/year"
+
+  financial_assumptions:
+    plant_lifetime:
+      value: 20
+      unit: "years"
+
+    discount_rate:
+      value: 10
+      unit: "%"
+
+    capacity_factor:
+      value: 90
+      unit: "%"
+      notes: "8,000 operating hours per year"
+
+    depreciation:
+      value: 10
+      unit: "years"
+      notes: "MACRS depreciation schedule"
+
+# =============================================================================
+# LIFE-CYCLE ASSESSMENT (LCA)
+# =============================================================================
+
+lca:
+  functional_unit: "MJ jet fuel (LHV)"
+
+  allocation_method: "energy"
+  allocation_factors:
+    saf_jet: 0.47
+    renewable_diesel: 0.43
+    other_products: 0.10
+
+  emission_factors:
+    feedstocks:
+      soybean_oil:
+        value: 25.6
+        unit: "gCO2e/MJ oil"
+        source: "GREET 2023"
+        scope: "cradle-to-gate"
+        notes: "Includes farming, oil extraction, transport"
+
+      hydrogen:
+        value: 94.5
+        unit: "gCO2e/MJ H2"
+        source: "GREET 2023"
+        scope: "SMR production"
+
+    utilities:
+      electricity:
+        value: 468
+        unit: "gCO2e/kWh"
+        source: "GREET 2023"
+        mix: "U.S. average grid"
+
+      natural_gas:
+        value: 59.1
+        unit: "gCO2e/MJ NG"
+        source: "GREET 2023"
+        scope: "extraction + combustion"
+
+  impact_calculation:
+    # Per 1000 kg soybean oil input basis
+
+    feedstock_impact:
+      oil_production:
+        value: 960
+        unit: "kgCO2e per tonne oil"
+        calculation: "1000 kg × 37.5 MJ/kg × 25.6 gCO2e/MJ / 1000"
+
+      hydrogen_production:
+        value: 397
+        unit: "kgCO2e per tonne oil"
+        calculation: "35 kg H2 × 120 MJ/kg × 94.5 gCO2e/MJ / 1000"
+
+    utility_impact:
+      electricity:
+        value: 14
+        unit: "kgCO2e per tonne oil"
+        calculation: "30 kWh × 468 gCO2e/kWh / 1000"
+
+      natural_gas:
+        value: 30
+        unit: "kgCO2e per tonne oil"
+        calculation: "~0.5 GJ × 59.1 gCO2e/MJ / 1000"
+
+    total_impact:
+      value: 1401
+      unit: "kgCO2e per tonne oil"
+
+    allocated_to_jet:
+      value: 659
+      unit: "kgCO2e per tonne oil"
+      notes: "47% energy allocation to jet fraction"
+
+  impact_results:
+    climate_change:
+      value: 33.8
+      unit: "gCO2e/MJ jet fuel"
+      method: "IPCC AR6 GWP100"
+      calculation: "659 kgCO2e / (450 kg × 43.2 MJ/kg) × 1000"
+      notes: >
+        This is cradle-to-gate CI. For well-to-wake, add combustion emissions
+        (~89 gCO2e/MJ) for total ~123 gCO2e/MJ (conventional jet ~89 gCO2e/MJ).
+        Net LCA benefit depends on biogenic carbon accounting.
+
+# =============================================================================
+# SENSITIVITY PARAMETERS
+# =============================================================================
+
+sensitivity:
+  parameters:
+    "feedstocks.soybean_oil.cost":
+      baseline: 800
+      range: {min: 600, max: 1200}
+      unit: "USD/tonne"
+      notes: "Highly variable by season and market"
+
+    "feedstocks.hydrogen.cost":
+      baseline: 2.50
+      range: {min: 1.50, max: 4.00}
+      unit: "USD/kg"
+      notes: "Depends on production method and scale"
+
+    "tea.financial_assumptions.capacity_factor":
+      baseline: 90
+      range: {min: 85, max: 95}
+      unit: "%"
+      notes: "Plant reliability and maintenance schedule"
+
+    "tea.capex.total":
+      baseline: 210.0
+      range: {min: 170, max: 270}
+      unit: "MM USD"
+      notes: "Site-specific factors, labor costs, regulations"
+
+# =============================================================================
+# DATA PROVENANCE
+# =============================================================================
+
+provenance:
+  sources:
+    greet2023:
+      citation: "GREET Model 2023, Argonne National Laboratory"
+      url: "https://greet.es.anl.gov/"
+      date_accessed: "2025-01-15"
+      reliability: "high"
+
+    nrel_hefa:
+      citation: "Pearlson et al. (2013) - NREL/TP-5100-58677"
+      url: "https://www.nrel.gov/docs/fy13osti/58677.pdf"
+      date_accessed: "2025-01-15"
+      reliability: "high"
+      notes: "General HEFA process concept"
+
+  assumptions:
+    hydrogen_source:
+      description: "Hydrogen sourced from natural gas SMR"
+      justification: "Most common current industrial source (~95% of production)"
+      impact: "High CI; green H2 would reduce LCA impact significantly"
+
+    plant_scale:
+      description: "100,000 tonne/year oil processing capacity"
+      justification: "Representative commercial scale for renewable diesel/SAF plants"
+      impact: "Smaller plants have higher specific CAPEX; larger have economies of scale"
+
+    yield_assumptions:
+      description: "~92% liquid hydrocarbon yield from oil"
+      justification: "Based on NREL and literature values"
+      impact: "Yield varies with feedstock quality and process conditions"
+
+# =============================================================================
+# VALIDATION NOTES
+# =============================================================================
+
+validation:
+  mass_balance_check:
+    status: "pass"
+    message: "Input/output mass within 0.5% (demonstration tolerance)"
+    tolerance: 0.5
+
+  energy_balance_check:
+    status: "pass"
+    message: "Energy balance closure within 1%"
+    tolerance: 1.0
+
+  warnings:
+    - "This pathway has not been validated against experimental data"
+    - "Capital costs are order-of-magnitude estimates only"
+    - "Real plants require detailed engineering for accurate economics"
+    - "LCA results depend on allocation method and system boundaries"
+    - "Hydrogen sourcing assumption has large impact on CI"
+
+# =============================================================================
+# END OF PATHWAY
+# =============================================================================
